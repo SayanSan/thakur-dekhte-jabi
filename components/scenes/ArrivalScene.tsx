@@ -4,12 +4,15 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import Image from "next/image";
 import PartnerLogos from "@/components/PartnerLogos";
+import MusicPlayer from "@/components/MusicPlayer";
+import ContributorsWidget from "@/components/ContributorsWidget";
 
 type ArrivalSceneProps = {
   onEnter: () => void;
   soundOn: boolean;
-  onToggleSound: () => void;
+  onToggleSound: (on: boolean) => void;
   disabled?: boolean;
+  player: any;
 };
 
 const PARTICLES = Array.from({ length: 24 }, (_, i) => ({
@@ -27,6 +30,7 @@ export default function ArrivalScene({
   soundOn,
   onToggleSound,
   disabled,
+  player,
 }: ArrivalSceneProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -302,9 +306,17 @@ export default function ArrivalScene({
             </p>
           </div>
 
+          {/* Music Player in the Center (Z = 100px) */}
+          <div
+            className="relative z-30 w-full max-w-[460px] px-6 my-1 flex justify-center"
+            style={{ transform: "translateZ(100px)", transformStyle: "preserve-3d" }}
+          >
+            <MusicPlayer player={player} mode="center" soundOn={soundOn} onToggleSound={onToggleSound} />
+          </div>
+
           {/* Footer Call To Action & 3D Interactive Button (Z = 120px) */}
           <div
-            className="relative z-30 flex flex-col items-center pb-24 sm:pb-28"
+            className="relative z-30 flex flex-col items-center pb-8 sm:pb-12"
             style={{ transform: "translateZ(120px)", transformStyle: "preserve-3d" }}
           >
             <div ref={buttonWrapRef} className="preserve-3d">
@@ -337,12 +349,17 @@ export default function ArrivalScene({
       {/* Sound Toggle Control in 3D bar */}
       <button
         type="button"
-        onClick={onToggleSound}
+        onClick={() => onToggleSound(!soundOn)}
         aria-label={soundOn ? "Turn sound off" : "Turn sound on"}
         className="absolute bottom-6 left-6 z-40 flex items-center gap-2 rounded-full border border-[#c9a35e]/30 bg-[#0d0914]/90 px-4 py-2 text-[0.68rem] uppercase tracking-[0.25em] text-[#cbb9a8] transition-all hover:border-[#c9a35e] hover:text-[#f3ecdf]"
       >
         {soundOn ? "◍ Sound On" : "◌ Sound Off"}
       </button>
+
+      {/* Contributors Widget on top-left of the screen */}
+      <div className="absolute top-6 left-6 z-40">
+        <ContributorsWidget />
+      </div>
 
       {/* Embedded CSS Animations */}
       <style jsx global>{`

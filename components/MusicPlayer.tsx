@@ -15,9 +15,11 @@ function formatTime(seconds: number) {
 interface MusicPlayerProps {
   soundOn?: boolean;
   onToggleSound?: (on: boolean) => void;
+  player: any;
+  mode?: "center" | "bottom";
 }
 
-export default function MusicPlayer({ soundOn, onToggleSound }: MusicPlayerProps) {
+export default function MusicPlayer({ soundOn, onToggleSound, player, mode = "bottom" }: MusicPlayerProps) {
   const [showPlaylist, setShowPlaylist] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -37,7 +39,7 @@ export default function MusicPlayer({ soundOn, onToggleSound }: MusicPlayerProps
     seekToFraction,
     play,
     pause,
-  } = useYouTubePlayer(PUJO_PLAYLIST);
+  } = player;
 
   // Synchronize playing state with global soundOn prop
   useEffect(() => {
@@ -65,9 +67,13 @@ export default function MusicPlayer({ soundOn, onToggleSound }: MusicPlayerProps
   );
 
   return (
-    <div className="pointer-events-auto fixed inset-x-0 bottom-4 z-40 flex flex-col items-center px-4 sm:bottom-6 select-none">
-      {/* Real YouTube playback engine */}
-      <div ref={containerRef} className="absolute h-px w-px overflow-hidden opacity-0" />
+    <div
+      className={
+        mode === "center"
+          ? "pointer-events-auto w-full max-w-[460px] flex flex-col items-center select-none"
+          : "pointer-events-auto fixed inset-x-0 bottom-4 z-40 flex flex-col items-center px-4 sm:bottom-6 select-none"
+      }
+    >
 
       {/* Expandable 56-Track Playlist Drawer */}
       {showPlaylist && (

@@ -12,6 +12,9 @@ import AmbientLayer from "@/components/AmbientLayer";
 import MilestoneNotification from "@/components/MilestoneNotification";
 import { usePresence } from "@/lib/usePresence";
 import PartnerLogos from "@/components/PartnerLogos";
+import { useYouTubePlayer } from "@/lib/useYouTubePlayer";
+import { PUJO_PLAYLIST } from "@/lib/pujoPlaylist";
+import ContributorsWidget from "@/components/ContributorsWidget";
 
 const PLAYLIST_URL =
   "https://open.spotify.com/playlist/7jrUOCZwvxp2zWxlHZVF7L";
@@ -22,6 +25,8 @@ type BaseVisual = "arrival" | "pandal";
 const IDLE_EXIT_MS = 100_000;
 
 export default function Home() {
+  const player = useYouTubePlayer(PUJO_PLAYLIST);
+
   const [phase, setPhase] = useState<Phase>("arrival");
   const [baseVisual, setBaseVisual] = useState<BaseVisual>("arrival");
   const [soundOn, setSoundOn] = useState(true);
@@ -92,14 +97,18 @@ export default function Home() {
 
   return (
     <div className="relative h-dvh w-full bg-black">
+      {/* Real YouTube playback engine (always mounted globally) */}
+      <div ref={player.containerRef} className="absolute h-px w-px overflow-hidden opacity-0" />
+
       <AmbientLayer scene={ambientScene} muted={!soundOn} />
 
       {baseVisual === "arrival" ? (
         <ArrivalScene
           onEnter={handleEnter}
           soundOn={soundOn}
-          onToggleSound={() => setSoundOn((v) => !v)}
+          onToggleSound={setSoundOn}
           disabled={phase === "transitioning"}
+          player={player}
         />
       ) : (
         <PandalScene />
@@ -111,9 +120,6 @@ export default function Home() {
           onComplete={() => setPhase("pandal")}
         />
       )}
-
-      {/* Render MusicPlayer globally on both pages */}
-      <MusicPlayer soundOn={soundOn} onToggleSound={setSoundOn} />
 
       {phase === "pandal" && (
         <>
@@ -136,12 +142,20 @@ export default function Home() {
                 <span className="text-[0.75rem]">←</span>
                 <span>Back</span>
               </button>
+
+              {/* Contributors widget on Pandal Page */}
+              <div className="pointer-events-auto mt-1 hidden sm:block">
+                <ContributorsWidget />
+              </div>
             </div>
             <div className="pointer-events-auto hidden md:block">
               <PartnerLogos />
             </div>
             <VisitorCounter count={count} />
           </div>
+
+          {/* MusicPlayer at the bottom in Pandal mode */}
+          <MusicPlayer soundOn={soundOn} onToggleSound={setSoundOn} player={player} mode="bottom" />
 
           <MilestoneNotification count={count} event={event} />
 
