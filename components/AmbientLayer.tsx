@@ -28,9 +28,9 @@ export default function AmbientLayer({ scene, muted }: AmbientLayerProps) {
     lastScene.current = scene;
 
     if (scene === "arrival") {
-      fadeTo("traffic", 0.55, 1200);
-      fadeTo("crowd", 0.18, 1500);
-      fadeTo("dhaak", 0.05, 800);
+      fadeTo("traffic", 0, 1200);
+      fadeTo("crowd", 0, 1500);
+      fadeTo("dhaak", 0, 800);
       fadeTo("pandal", 0, 800);
     } else if (scene === "transition") {
       fadeTo("traffic", 0, 900);
