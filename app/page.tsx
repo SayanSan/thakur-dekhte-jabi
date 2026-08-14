@@ -1,69 +1,186 @@
-import Image from "next/image";
+"use client";
+
+import "@/lib/gsapConfig";
+import { useEffect, useRef, useState } from "react";
+import ArrivalScene from "@/components/scenes/ArrivalScene";
+import EnterPandalTransition from "@/components/scenes/EnterPandalTransition";
+import PandalScene from "@/components/scenes/PandalScene";
+import VisitorCounter from "@/components/VisitorCounter";
+import MusicPlayer from "@/components/MusicPlayer";
+import SoundController from "@/components/SoundController";
+import AmbientLayer from "@/components/AmbientLayer";
+import MilestoneNotification from "@/components/MilestoneNotification";
+import { usePresence } from "@/lib/usePresence";
+
+const PLAYLIST_URL =
+  "https://open.spotify.com/playlist/7jrUOCZwvxp2zWxlHZVF7L";
+
+type Phase = "arrival" | "transitioning" | "pandal";
+type BaseVisual = "arrival" | "pandal";
+
+const IDLE_EXIT_MS = 100_000;
 
 export default function Home() {
+  const [phase, setPhase] = useState<Phase>("arrival");
+  const [baseVisual, setBaseVisual] = useState<BaseVisual>("arrival");
+  const [soundOn, setSoundOn] = useState(true);
+  const [showExitPrompt, setShowExitPrompt] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [showMobileHint, setShowMobileHint] = useState(false);
+
+  const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const { count, event } = usePresence(phase === "pandal");
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- matchMedia result is unknown during SSR render
+    setIsMobile(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  useEffect(() => {
+    if (phase !== "pandal" || !isMobile) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- timed hint synced to a setTimeout, not derived state
+    setShowMobileHint(true);
+    const t = setTimeout(() => setShowMobileHint(false), 4500);
+    return () => clearTimeout(t);
+  }, [phase, isMobile]);
+
+  useEffect(() => {
+    if (phase !== "pandal") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- resets UI when leaving the pandal, not derived state
+      setShowExitPrompt(false);
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+      return;
+    }
+
+    const resetTimer = () => {
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+      idleTimerRef.current = setTimeout(
+        () => setShowExitPrompt(true),
+        IDLE_EXIT_MS,
+      );
+    };
+
+    const events = ["pointermove", "keydown", "touchstart", "wheel"];
+    events.forEach((ev) => window.addEventListener(ev, resetTimer));
+    resetTimer();
+
+    return () => {
+      events.forEach((ev) => window.removeEventListener(ev, resetTimer));
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    };
+  }, [phase]);
+
+  const handleEnter = () => {
+    setSoundOn(true);
+    setPhase("transitioning");
+  };
+
+  const handleEnterAgain = () => {
+    setShowExitPrompt(false);
+    setBaseVisual("arrival");
+    setPhase("arrival");
+  };
+
+  const ambientScene =
+    phase === "transitioning" ? "transition" : phase === "pandal" && baseVisual === "pandal" ? "pandal" : "arrival";
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="relative h-dvh w-full bg-black">
+      <AmbientLayer scene={ambientScene} muted={!soundOn} />
+
+      {baseVisual === "arrival" ? (
+        <ArrivalScene
+          onEnter={handleEnter}
+          soundOn={soundOn}
+          onToggleSound={() => setSoundOn((v) => !v)}
+          disabled={phase === "transitioning"}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      ) : (
+        <PandalScene />
+      )}
+
+      {phase === "transitioning" && (
+        <EnterPandalTransition
+          onMidpoint={() => setBaseVisual("pandal")}
+          onComplete={() => setPhase("pandal")}
+        />
+      )}
+
+      {phase === "pandal" && (
+        <>
+          <div className="pointer-events-none fixed inset-x-0 top-0 z-20 flex items-start justify-between p-5 sm:p-7">
+            <div className="flex flex-col items-start gap-3">
+              <p className="text-[0.78rem] uppercase tracking-[0.22em] text-[#f3ecdf]/85">
+                Thakur Dekhte Jabi?
+              </p>
+              <SoundController
+                className="pointer-events-auto"
+                soundOn={soundOn}
+                onToggle={() => setSoundOn((v) => !v)}
+              />
+              <button
+                type="button"
+                onClick={() => setShowExitPrompt(true)}
+                className="pointer-events-auto flex items-center gap-2 rounded-full border border-[#c9a35e]/25 bg-[#0c0a10]/60 px-3 py-1.5 text-[0.68rem] uppercase tracking-[0.18em] text-[#cbb9a8]/70 backdrop-blur-sm transition-all hover:border-[#c9a35e]/50 hover:bg-[#c9a35e]/10 hover:text-[#f3ecdf]"
+                aria-label="Go back"
+              >
+                <span className="text-[0.75rem]">←</span>
+                <span>Back</span>
+              </button>
+            </div>
+            <VisitorCounter count={count} />
+          </div>
+
+          <MusicPlayer />
+          <MilestoneNotification count={count} event={event} />
+
+          {isMobile && showMobileHint && (
+            <div className="toast pointer-events-none fixed bottom-24 left-1/2 z-40 -translate-x-1/2 whitespace-nowrap rounded-full border border-[#c9a35e]/20 bg-[#0c0a10]/85 px-4 py-2 text-[0.68rem] uppercase tracking-[0.2em] text-[#f3ecdf]">
+              Turn your sound on.
+            </div>
+          )}
+
+          {showExitPrompt && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+              <div className="drift-in mx-6 max-w-sm rounded-2xl border border-[#c9a35e]/25 bg-[#0c0a10]/95 px-8 py-9 text-center">
+                <p className="font-bengali text-2xl text-[#f3ecdf]">
+                  পুজো শেষ?
+                </p>
+                <p className="mt-3 text-sm text-[#cbb9a8]">
+                  Playlist-ta rekhe de.
+                </p>
+                <a
+                  href={PLAYLIST_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-7 inline-flex items-center gap-2 rounded-full border border-[#c9a35e]/50 px-6 py-2.5 text-xs uppercase tracking-[0.2em] text-[#f3ecdf] transition-colors hover:bg-[#c9a35e]/10"
+                >
+                  Open Pujo Playlist →
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setShowExitPrompt(false)}
+                  className="mt-5 block w-full text-[0.68rem] uppercase tracking-[0.2em] text-[#cbb9a8]/60 transition-colors hover:text-[#f3ecdf]"
+                >
+                  Stay a while
+                </button>
+                <button
+                  type="button"
+                  onClick={handleEnterAgain}
+                  className="mt-2 block w-full text-[0.68rem] uppercase tracking-[0.2em] text-[#cbb9a8]/60 transition-colors hover:text-[#f3ecdf]"
+                >
+                  Enter Again
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
