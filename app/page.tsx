@@ -8,10 +8,9 @@ import PandalScene from "@/components/scenes/PandalScene";
 import VisitorCounter from "@/components/VisitorCounter";
 import MusicPlayer from "@/components/MusicPlayer";
 import SoundController from "@/components/SoundController";
-import AmbientLayer from "@/components/AmbientLayer";
 import MilestoneNotification from "@/components/MilestoneNotification";
 import { usePresence } from "@/lib/usePresence";
-import PartnerLogos from "@/components/PartnerLogos";
+import { LeftLogos, RightLogos } from "@/components/PartnerLogos";
 import { useYouTubePlayer } from "@/lib/useYouTubePlayer";
 import { PUJO_PLAYLIST } from "@/lib/pujoPlaylist";
 import ContributorsWidget from "@/components/ContributorsWidget";
@@ -92,15 +91,10 @@ export default function Home() {
     setPhase("arrival");
   };
 
-  const ambientScene =
-    phase === "transitioning" ? "transition" : phase === "pandal" && baseVisual === "pandal" ? "pandal" : "arrival";
-
   return (
     <div className="relative h-dvh w-full bg-black">
       {/* Real YouTube playback engine (always mounted globally) */}
       <div ref={player.containerRef} className="absolute h-px w-px overflow-hidden opacity-0" />
-
-      <AmbientLayer scene={ambientScene} muted={!soundOn} />
 
       {baseVisual === "arrival" ? (
         <ArrivalScene
@@ -123,8 +117,13 @@ export default function Home() {
 
       {phase === "pandal" && (
         <>
+          {/* Top bar: logos, title, sound, back */}
           <div className="pointer-events-none fixed inset-x-0 top-0 z-20 flex items-start justify-between p-5 sm:p-7">
+            {/* Top-left: Onyo Puja + Offbeat logos, site title, controls */}
             <div className="flex flex-col items-start gap-3">
+              <div className="pointer-events-auto hidden md:block">
+                <LeftLogos />
+              </div>
               <p className="text-[0.78rem] uppercase tracking-[0.22em] text-[#f3ecdf]/85">
                 Thakur Dekhte Jabi?
               </p>
@@ -142,16 +141,20 @@ export default function Home() {
                 <span className="text-[0.75rem]">←</span>
                 <span>Back</span>
               </button>
+            </div>
 
-              {/* Contributors widget on Pandal Page */}
-              <div className="pointer-events-auto mt-1 hidden sm:block">
-                <ContributorsWidget />
+            {/* Top-right: MCRA + Smiley logos + visitor counter */}
+            <div className="flex flex-col items-end gap-3">
+              <div className="pointer-events-auto hidden md:block">
+                <RightLogos />
               </div>
+              <VisitorCounter count={count} />
             </div>
-            <div className="pointer-events-auto hidden md:block">
-              <PartnerLogos />
-            </div>
-            <VisitorCounter count={count} />
+          </div>
+
+          {/* Bottom-right: Contributors */}
+          <div className="pointer-events-auto fixed bottom-20 right-5 z-30 hidden sm:block sm:right-7">
+            <ContributorsWidget />
           </div>
 
           {/* MusicPlayer at the bottom in Pandal mode */}

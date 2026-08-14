@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import Image from "next/image";
-import PartnerLogos from "@/components/PartnerLogos";
+import { LeftLogos, RightLogos } from "@/components/PartnerLogos";
 import MusicPlayer from "@/components/MusicPlayer";
 import ContributorsWidget from "@/components/ContributorsWidget";
 
@@ -186,179 +186,276 @@ export default function ArrivalScene({
   };
 
   return (
-    <div className="relative h-dvh w-full overflow-hidden bg-[#060408] perspective-1000 select-none">
-      {/* Dynamic Ambient Background Blur */}
-      <div
-        ref={containerRef}
-        className="absolute inset-[-6%] scale-105 transition-transform duration-700 ease-out"
-      >
-        <Image
-          src="/starting-screen.jpg"
-          alt="Pandal Scene Ambient Background"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover opacity-55 filter contrast-110 saturate-150"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#060408]/80 via-[#060408]/30 to-[#060408]/40" />
-      </div>
+    <div className="relative h-dvh w-full overflow-hidden bg-[#060408] select-none">
 
-      {/* Decorative Night Stars/Sparks */}
-      <div className="pointer-events-none absolute inset-0 z-0 opacity-60">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage:
-              "radial-gradient(rgba(255, 215, 120, 0.6) 1.5px, transparent 1.5px)",
-            backgroundSize: "44px 44px",
-          }}
-        />
-      </div>
+      {/* ─── MOBILE LAYOUT (< md) ─────────────────────────────── */}
+      <div className="md:hidden absolute inset-0 flex flex-col">
+        {/* Outdoor pandal portrait background */}
+        <div className="absolute inset-0">
+          <Image
+            src="/mobile-bg-pandal.jpg"
+            alt="Durga Puja Pandal"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
+          />
+          {/* Gradient scrim: dark top for readability, strong bottom for player */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#060408]/50 via-transparent to-[#060408]/88" />
+        </div>
 
-      {/* Main 3D Card Stage Wrapper (Screen Fit) */}
-      <div className="relative z-10 flex h-full w-full items-center justify-center p-0 sm:p-4 md:p-6">
-        <div
-          ref={cardRef}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          className="preserve-3d group relative flex h-full w-full flex-col items-center justify-between overflow-hidden rounded-none sm:rounded-3xl border-0 sm:border border-[#c9a35e]/40 bg-[#0d0914]/70 shadow-[0_30px_90px_rgba(0,0,0,0.8)] transition-shadow duration-500 hover:border-[#c9a35e]/70 hover:shadow-[0_45px_120px_rgba(201,163,94,0.35)]"
-          style={{
-            transformStyle: "preserve-3d",
-          }}
-        >
-          {/* Main Artwork Image Layer (Z = 0) (Full Screen Fit) */}
-          <div className="absolute inset-0 overflow-hidden rounded-none sm:rounded-3xl">
+        {/* Top bar: logos row + sound toggle */}
+        <div className="relative z-10 flex items-center justify-between px-4 pt-10">
+          {/* Left logos: Onyo Pujo + Offbeat */}
+          <div className="flex items-center gap-2">
             <Image
-              src="/starting-screen.jpg"
-              alt="Durga Puja Pandal Scene"
-              fill
-              priority
-              sizes="100vw"
-              className={`object-cover object-center brightness-110 saturate-[1.15] transition-transform duration-700 ease-out ${
-                isHovered ? "scale-105" : "scale-100"
-              }`}
+              src="/onnya-pujo-logo.png"
+              alt="Onyo Pujo"
+              width={70}
+              height={24}
+              className="h-6 w-auto object-contain opacity-90"
             />
-
-            {/* Warm Painterly Lighting Vignette & Depth Gradients — kept light for vibrant feel */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#09060c]/70 via-transparent to-transparent opacity-80" />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#09060c]/30 via-transparent to-[#09060c]/30" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,transparent_45%,rgba(6,4,8,0.45)_100%)]" />
-
-            {/* Dynamic Interactive 3D Glare Sheen Overlay */}
-            <div
-              ref={glareRef}
-              className="pointer-events-none absolute inset-0 mix-blend-soft-light transition-opacity duration-500"
-              style={{
-                background:
-                  "radial-gradient(circle at 50% 50%, rgba(255, 220, 160, 0.25) 0%, transparent 55%)",
-              }}
+            <div className="h-5 w-px bg-[#c9a35e]/30" />
+            <Image
+              src="/offbeat-horizontal-logo.png"
+              alt="Offbeat CCU"
+              width={80}
+              height={28}
+              className="h-7 w-auto object-contain opacity-90"
             />
+          </div>
+          {/* Right logos + sound */}
+          <div className="flex items-center gap-2">
+            <Image
+              src="/mcra-logo.png"
+              alt="MCRA"
+              width={60}
+              height={24}
+              className="h-6 w-auto object-contain opacity-90"
+            />
+            <Image
+              src="/smiley-logo.jpg"
+              alt="CCU App"
+              width={26}
+              height={26}
+              className="h-6 w-6 rounded-full object-cover opacity-90"
+            />
+            <button
+              type="button"
+              onClick={() => onToggleSound(!soundOn)}
+              aria-label={soundOn ? "Turn sound off" : "Turn sound on"}
+              className="ml-1 flex items-center gap-1 rounded-full border border-[#c9a35e]/30 bg-[#0d0914]/80 px-2.5 py-1 text-[0.58rem] uppercase tracking-[0.18em] text-[#cbb9a8]"
+            >
+              {soundOn ? "◍" : "◌"}
+            </button>
+          </div>
+        </div>
 
-            {/* Animated Golden Ambient Lights — boosted for festive glow */}
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-60 bg-gradient-to-b from-[#ffb443]/35 via-[#ff9548]/10 to-transparent" />
-
-            {/* Central warm light bloom */}
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_45%,rgba(255,200,100,0.12)_0%,transparent_60%)]" />
+        {/* Center: Badge + Title + CTA — grows to fill space */}
+        <div className="relative z-10 flex flex-1 flex-col items-center justify-end pb-3 px-4 text-center gap-3">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-[#c9a35e]/40 bg-[#0d0a12]/80 px-3 py-1">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#ff9548] animate-pulse" />
+            <span className="font-bengali text-[0.6rem] uppercase tracking-[0.2em] text-[#f3ecdf]">
+              Digital Pujo
+            </span>
           </div>
 
-          {/* 3D Floating Festive Embers / Marigold Sparks (Z = 60px) */}
-          <div
-            className="pointer-events-none absolute inset-0 z-20 overflow-hidden"
-            style={{ transform: "translateZ(60px)" }}
+          <h1 className="font-bengali text-[clamp(2.6rem,12vw,4.2rem)] font-bold leading-[1.05] text-[#f3ecdf] drop-shadow-[0_6px_20px_rgba(0,0,0,0.95)]">
+            ঠাকুর দেখতে যাবি?
+          </h1>
+          <p className="text-[0.68rem] font-bold uppercase tracking-[0.15em] text-[#ffd788]/90 drop-shadow-md">
+            Pandal Bangers from 80s, 90s &amp; 2000s
+          </p>
+
+          {/* Enter CTA */}
+          <button
+            type="button"
+            onClick={handleEnterClick}
+            disabled={disabled}
+            aria-label="Enter the pandal"
+            className="mt-1 flex items-center gap-3 rounded-full border border-[#c9a35e]/60 bg-gradient-to-r from-[#201529]/95 via-[#3a251e]/95 to-[#201529]/95 px-7 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-[#f3ecdf] shadow-[0_10px_30px_rgba(0,0,0,0.8)] active:scale-95 transition-transform disabled:opacity-50"
           >
-            {PARTICLES.map((p) => (
-              <div
-                key={p.id}
-                className="flicker absolute rounded-full bg-[#ffe08a]"
-                style={{
-                  left: p.left,
-                  top: p.top,
-                  width: `${p.size + 2}px`,
-                  height: `${p.size + 2}px`,
-                  boxShadow: `0 0 ${p.size * 4}px ${p.size * 1.5}px rgba(255,210,100,0.9)`,
-                  animation: `emberFloat ${p.duration}s ease-in-out infinite alternate`,
-                  animationDelay: `${p.delay}s`,
-                  transform: `translateZ(${p.depth}px)`,
-                }}
-              />
-            ))}
-          </div>
+            <span>Enter Pandal</span>
+            <span className="flex h-6 w-6 items-center justify-center rounded-full border border-[#c9a35e]/50 bg-[#ff9548]/20 text-xs">→</span>
+          </button>
+        </div>
 
-          <div
-            ref={titleRef}
-            className="relative z-30 flex flex-col items-center pt-8 text-center sm:pt-12 gap-4"
-            style={{ transform: "translateZ(90px)", transformStyle: "preserve-3d" }}
-          >
-            <PartnerLogos />
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#c9a35e]/40 bg-[#0d0a12]/90 px-4 py-1.5 shadow-lg">
-              <span className="h-2 w-2 rounded-full bg-[#ff9548] animate-pulse" />
-              <span className="font-bengali text-xs uppercase tracking-[0.25em] text-[#f3ecdf]">
-                দুর্গা পুজো অভিজ্ঞতা • DIGITAL PUJO
-              </span>
-            </div>
+        {/* Contributors — in flow, above player, right-aligned */}
+        <div className="relative z-20 flex justify-end px-4 pb-2">
+          <ContributorsWidget />
+        </div>
 
-            <h1 className="mt-4 font-bengali text-[clamp(2.2rem,6.5vw,5.2rem)] font-bold leading-[1.1] tracking-normal text-[#f3ecdf] drop-shadow-[0_10px_25px_rgba(0,0,0,0.9)]">
-              ঠাকুর দেখতে যাবি?
-            </h1>
-
-            <p className="mt-3 text-[0.75rem] font-bold uppercase tracking-[0.18em] text-[#ffd788]/90 sm:text-sm drop-shadow-md">
-              Durga Puja Pandal Bangers from 80s, 90s and 2000s
-            </p>
-          </div>
-
-          {/* Music Player in the Center (Z = 100px) */}
-          <div
-            className="relative z-30 w-full max-w-[460px] px-6 my-1 flex justify-center"
-            style={{ transform: "translateZ(100px)", transformStyle: "preserve-3d" }}
-          >
-            <MusicPlayer player={player} mode="center" soundOn={soundOn} onToggleSound={onToggleSound} />
-          </div>
-
-          {/* Footer Call To Action & 3D Interactive Button (Z = 120px) */}
-          <div
-            className="relative z-30 flex flex-col items-center pb-8 sm:pb-12"
-            style={{ transform: "translateZ(120px)", transformStyle: "preserve-3d" }}
-          >
-            <div ref={buttonWrapRef} className="preserve-3d">
-              <button
-                ref={buttonInnerRef}
-                type="button"
-                onClick={handleEnterClick}
-                disabled={disabled}
-                aria-label="Enter the pandal"
-                className="group relative flex items-center gap-4 rounded-full border border-[#c9a35e]/60 bg-gradient-to-r from-[#201529]/95 via-[#3a251e]/95 to-[#201529]/95 px-9 py-4 text-sm font-semibold uppercase tracking-[0.25em] text-[#f3ecdf] shadow-[0_15px_35px_rgba(0,0,0,0.8)] transition-all duration-500 hover:border-[#ffd788] hover:bg-[#c9a35e]/20 hover:shadow-[0_20px_50px_rgba(255,195,90,0.35)] disabled:opacity-50"
-                style={{ transformStyle: "preserve-3d" }}
-              >
-                <span className="relative z-10 drop-shadow-sm">Enter Pandal</span>
-                <span className="relative z-10 flex h-7 w-7 items-center justify-center rounded-full border border-[#c9a35e]/50 bg-[#ff9548]/20 transition-transform duration-500 group-hover:translate-x-1.5 group-hover:bg-[#ff9548]/40">
-                  →
-                </span>
-
-                {/* Button 3D Ambient Glow Ring */}
-                <span className="absolute inset-0 rounded-full bg-gradient-to-r from-[#ff9548]/0 via-[#ffcf73]/30 to-[#ff9548]/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-              </button>
-            </div>
-
-            <p className="mt-4 text-[0.65rem] uppercase tracking-[0.3em] text-[#cbb9a8]/70">
-              Move cursor for 3D depth tilt
-            </p>
-          </div>
+        {/* Music player — docked at bottom */}
+        <div className="relative z-20 w-full px-3 pb-6">
+          <MusicPlayer player={player} mode="center" soundOn={soundOn} onToggleSound={onToggleSound} />
         </div>
       </div>
 
-      {/* Sound Toggle Control in 3D bar */}
-      <button
-        type="button"
-        onClick={() => onToggleSound(!soundOn)}
-        aria-label={soundOn ? "Turn sound off" : "Turn sound on"}
-        className="absolute bottom-6 left-6 z-40 flex items-center gap-2 rounded-full border border-[#c9a35e]/30 bg-[#0d0914]/90 px-4 py-2 text-[0.68rem] uppercase tracking-[0.25em] text-[#cbb9a8] transition-all hover:border-[#c9a35e] hover:text-[#f3ecdf]"
-      >
-        {soundOn ? "◍ Sound On" : "◌ Sound Off"}
-      </button>
 
-      {/* Contributors Widget on top-left of the screen */}
-      <div className="absolute top-6 left-6 z-40">
-        <ContributorsWidget />
+      {/* ─── DESKTOP LAYOUT (md+) ─────────────────────────────── */}
+      <div className="hidden md:block absolute inset-0 perspective-1000">
+        {/* Dynamic Ambient Background Blur */}
+        <div
+          ref={containerRef}
+          className="absolute inset-[-6%] scale-105 transition-transform duration-700 ease-out"
+        >
+          <Image
+            src="/starting-screen.jpg"
+            alt="Pandal Scene Ambient Background"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover opacity-55 filter contrast-110 saturate-150"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#060408]/80 via-[#060408]/30 to-[#060408]/40" />
+        </div>
+
+        {/* Decorative Night Stars */}
+        <div className="pointer-events-none absolute inset-0 z-0 opacity-60">
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: "radial-gradient(rgba(255, 215, 120, 0.6) 1.5px, transparent 1.5px)",
+              backgroundSize: "44px 44px",
+            }}
+          />
+        </div>
+
+        {/* Main 3D Card Stage */}
+        <div className="relative z-10 flex h-full w-full items-center justify-center p-4 md:p-6">
+          <div
+            ref={cardRef}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            className="preserve-3d group relative flex h-full w-full flex-col items-center justify-between overflow-hidden rounded-3xl border border-[#c9a35e]/40 bg-[#0d0914]/70 shadow-[0_30px_90px_rgba(0,0,0,0.8)] transition-shadow duration-500 hover:border-[#c9a35e]/70 hover:shadow-[0_45px_120px_rgba(201,163,94,0.35)]"
+            style={{ transformStyle: "preserve-3d" }}
+          >
+            {/* Main Artwork */}
+            <div className="absolute inset-0 overflow-hidden rounded-3xl">
+              <Image
+                src="/starting-screen.jpg"
+                alt="Durga Puja Pandal Scene"
+                fill
+                priority
+                sizes="100vw"
+                className={`object-cover object-center brightness-110 saturate-[1.15] transition-transform duration-700 ease-out ${
+                  isHovered ? "scale-105" : "scale-100"
+                }`}
+              />
+              {/* Glare sheen */}
+              <div
+                ref={glareRef}
+                className="pointer-events-none absolute inset-0 mix-blend-soft-light transition-opacity duration-500"
+                style={{
+                  background: "radial-gradient(circle at 50% 50%, rgba(255, 220, 160, 0.25) 0%, transparent 55%)",
+                }}
+              />
+            </div>
+
+            {/* Floating Embers */}
+            <div
+              className="pointer-events-none absolute inset-0 z-20 overflow-hidden"
+              style={{ transform: "translateZ(60px)" }}
+            >
+              {PARTICLES.map((p) => (
+                <div
+                  key={p.id}
+                  className="flicker absolute rounded-full bg-[#ffe08a]"
+                  style={{
+                    left: p.left,
+                    top: p.top,
+                    width: `${p.size + 2}px`,
+                    height: `${p.size + 2}px`,
+                    boxShadow: `0 0 ${p.size * 4}px ${p.size * 1.5}px rgba(255,210,100,0.9)`,
+                    animation: `emberFloat ${p.duration}s ease-in-out infinite alternate`,
+                    animationDelay: `${p.delay}s`,
+                    transform: `translateZ(${p.depth}px)`,
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Title block */}
+            <div
+              ref={titleRef}
+              className="relative z-30 flex flex-col items-center pt-12 text-center gap-4"
+              style={{ transform: "translateZ(90px)", transformStyle: "preserve-3d" }}
+            >
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#c9a35e]/40 bg-[#0d0a12]/90 px-4 py-1.5 shadow-lg">
+                <span className="h-2 w-2 rounded-full bg-[#ff9548] animate-pulse" />
+                <span className="font-bengali text-xs uppercase tracking-[0.25em] text-[#f3ecdf]">
+                  দুর্গা পুজো অভিজ্ঞতা • DIGITAL PUJO
+                </span>
+              </div>
+
+              <h1 className="mt-4 font-bengali text-[clamp(2.2rem,6.5vw,5.2rem)] font-bold leading-[1.1] tracking-normal text-[#f3ecdf] drop-shadow-[0_10px_25px_rgba(0,0,0,0.9)]">
+                ঠাকুর দেখতে যাবি?
+              </h1>
+
+              <p className="mt-3 text-[0.75rem] font-bold uppercase tracking-[0.18em] text-[#ffd788]/90 sm:text-sm drop-shadow-md">
+                Durga Puja Pandal Bangers from 80s, 90s and 2000s
+              </p>
+            </div>
+
+            {/* CTA Button */}
+            <div
+              className="relative z-30 flex flex-col items-center pb-12"
+              style={{ transform: "translateZ(120px)", transformStyle: "preserve-3d" }}
+            >
+              <div ref={buttonWrapRef} className="preserve-3d">
+                <button
+                  ref={buttonInnerRef}
+                  type="button"
+                  onClick={handleEnterClick}
+                  disabled={disabled}
+                  aria-label="Enter the pandal"
+                  className="group relative flex items-center gap-4 rounded-full border border-[#c9a35e]/60 bg-gradient-to-r from-[#201529]/95 via-[#3a251e]/95 to-[#201529]/95 px-9 py-4 text-sm font-semibold uppercase tracking-[0.25em] text-[#f3ecdf] shadow-[0_15px_35px_rgba(0,0,0,0.8)] transition-all duration-500 hover:border-[#ffd788] hover:bg-[#c9a35e]/20 hover:shadow-[0_20px_50px_rgba(255,195,90,0.35)] disabled:opacity-50"
+                  style={{ transformStyle: "preserve-3d" }}
+                >
+                  <span className="relative z-10 drop-shadow-sm">Enter Pandal</span>
+                  <span className="relative z-10 flex h-7 w-7 items-center justify-center rounded-full border border-[#c9a35e]/50 bg-[#ff9548]/20 transition-transform duration-500 group-hover:translate-x-1.5 group-hover:bg-[#ff9548]/40">
+                    →
+                  </span>
+                  <span className="absolute inset-0 rounded-full bg-gradient-to-r from-[#ff9548]/0 via-[#ffcf73]/30 to-[#ff9548]/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                </button>
+              </div>
+
+              <p className="mt-4 text-[0.65rem] uppercase tracking-[0.3em] text-[#cbb9a8]/70">
+                Move cursor for 3D depth tilt
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Top-left logos */}
+        <div className="absolute top-6 left-6 z-40">
+          <LeftLogos />
+        </div>
+
+        {/* Top-right logos */}
+        <div className="absolute top-6 right-6 z-40">
+          <RightLogos />
+        </div>
+
+        {/* Sound toggle */}
+        <button
+          type="button"
+          onClick={() => onToggleSound(!soundOn)}
+          aria-label={soundOn ? "Turn sound off" : "Turn sound on"}
+          className="absolute bottom-6 left-6 z-40 flex items-center gap-2 rounded-full border border-[#c9a35e]/30 bg-[#0d0914]/90 px-4 py-2 text-[0.68rem] uppercase tracking-[0.25em] text-[#cbb9a8] transition-all hover:border-[#c9a35e] hover:text-[#f3ecdf]"
+        >
+          {soundOn ? "◍ Sound On" : "◌ Sound Off"}
+        </button>
+
+        {/* Contributors */}
+        <div className="absolute bottom-6 right-6 z-40">
+          <ContributorsWidget />
+        </div>
+
+        {/* Music Player outside 3D card */}
+        <div className="absolute left-1/2 top-[58%] z-50 -translate-x-1/2 -translate-y-1/2 w-full max-w-[480px] px-4">
+          <MusicPlayer player={player} mode="center" soundOn={soundOn} onToggleSound={onToggleSound} />
+        </div>
       </div>
 
       {/* Embedded CSS Animations */}
@@ -389,3 +486,4 @@ export default function ArrivalScene({
     </div>
   );
 }
+

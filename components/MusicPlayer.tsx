@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { PUJO_PLAYLIST, PLAYLIST_URL } from "@/lib/pujoPlaylist";
-import { useYouTubePlayer } from "@/lib/useYouTubePlayer";
 
 function formatTime(seconds: number) {
   if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
@@ -24,7 +23,6 @@ export default function MusicPlayer({ soundOn, onToggleSound, player, mode = "bo
   const [searchQuery, setSearchQuery] = useState("");
 
   const {
-    containerRef,
     ready,
     isPlaying,
     currentTime,
@@ -239,10 +237,9 @@ export default function MusicPlayer({ soundOn, onToggleSound, player, mode = "bo
           <button
             type="button"
             onClick={() => {
+              toggle();
               if (onToggleSound) {
                 onToggleSound(!isPlaying);
-              } else {
-                toggle();
               }
             }}
             aria-label={isPlaying ? "Pause" : "Play"}
