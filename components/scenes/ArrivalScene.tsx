@@ -304,7 +304,7 @@ export default function ArrivalScene({
 
           {/* Footer Call To Action & 3D Interactive Button (Z = 120px) */}
           <div
-            className="relative z-30 flex flex-col items-center pb-8 sm:pb-12"
+            className="relative z-30 flex flex-col items-center pb-24 sm:pb-28"
             style={{ transform: "translateZ(120px)", transformStyle: "preserve-3d" }}
           >
             <div ref={buttonWrapRef} className="preserve-3d">
