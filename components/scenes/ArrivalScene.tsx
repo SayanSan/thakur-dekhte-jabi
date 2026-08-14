@@ -297,8 +297,8 @@ export default function ArrivalScene({
               ঠাকুর দেখতে যাবি?
             </h1>
 
-            <p className="mt-3 text-[0.7rem] font-light uppercase tracking-[0.4em] text-[#e3d7c3]/80 sm:text-xs drop-shadow-md">
-              Step into the vibrant Pandal • Feel the Festivity
+            <p className="mt-3 text-[0.75rem] font-bold uppercase tracking-[0.18em] text-[#ffd788]/90 sm:text-sm drop-shadow-md">
+              Durga Puja Pandal Bangers from 80s, 90s and 2000s
             </p>
           </div>
 
