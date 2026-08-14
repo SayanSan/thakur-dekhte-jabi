@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Track } from "./pujoPlaylist";
 
-interface YTPlayerInstance {
+export interface YTPlayerInstance {
   playVideo: () => void;
   pauseVideo: () => void;
   loadVideoById: (id: string) => void;
@@ -11,6 +11,8 @@ interface YTPlayerInstance {
   seekTo: (seconds: number, allowSeekAhead: boolean) => void;
   getCurrentTime: () => number;
   getDuration: () => number;
+  setVolume: (v: number) => void;
+  getPlayerState: () => number;
   destroy: () => void;
 }
 
@@ -25,7 +27,7 @@ interface YTNamespace {
       height: string;
       width: string;
       videoId: string;
-      playerVars: Record<string, number>;
+      playerVars: Record<string, number | string>;
       events: {
         onReady: () => void;
         onStateChange: (e: YTStateChangeEvent) => void;
@@ -44,7 +46,7 @@ declare global {
 
 let apiLoadPromise: Promise<YTNamespace> | null = null;
 
-function loadYouTubeApi(): Promise<YTNamespace> {
+export function loadYouTubeApi(): Promise<YTNamespace> {
   if (window.YT?.Player) return Promise.resolve(window.YT);
   if (apiLoadPromise) return apiLoadPromise;
 

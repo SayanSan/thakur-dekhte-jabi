@@ -1,60 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useCallback } from "react";
+import { loadYouTubeApi, type YTPlayerInstance } from "@/lib/useYouTubePlayer";
 
 const VIDEO_ID = "foyvkqRxM5k";
-
-interface YTPlayerInstance {
-  playVideo: () => void;
-  pauseVideo: () => void;
-  setVolume: (v: number) => void;
-  getPlayerState: () => number;
-  destroy: () => void;
-}
-
-interface YTNamespace {
-  Player: new (
-    el: HTMLElement,
-    opts: {
-      height: string;
-      width: string;
-      videoId: string;
-      playerVars: Record<string, number | string>;
-      events: {
-        onReady: () => void;
-        onStateChange: (e: { data: number }) => void;
-      };
-    },
-  ) => YTPlayerInstance;
-  PlayerState: { PLAYING: number; PAUSED: number; ENDED: number };
-}
-
-declare global {
-  interface Window {
-    YT?: YTNamespace;
-    onYouTubeIframeAPIReady?: () => void;
-  }
-}
-
-let apiLoadPromise: Promise<YTNamespace> | null = null;
-
-function loadYouTubeApi(): Promise<YTNamespace> {
-  if (window.YT?.Player) return Promise.resolve(window.YT);
-  if (apiLoadPromise) return apiLoadPromise;
-
-  apiLoadPromise = new Promise((resolve) => {
-    const previous = window.onYouTubeIframeAPIReady;
-    window.onYouTubeIframeAPIReady = () => {
-      previous?.();
-      resolve(window.YT as YTNamespace);
-    };
-    const script = document.createElement("script");
-    script.src = "https://www.youtube.com/iframe_api";
-    script.async = true;
-    document.head.appendChild(script);
-  });
-  return apiLoadPromise;
-}
 
 type ArrivalBgMusicProps = {
   soundOn: boolean;
