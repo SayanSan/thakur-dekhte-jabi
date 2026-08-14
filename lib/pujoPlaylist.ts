@@ -6,6 +6,11 @@ export type Track = {
 
 export const PUJO_PLAYLIST: Track[] = [
   {
+    videoId: "foyvkqRxM5k",
+    title: "Aaro Dure Chalo Jai",
+    artist: "Asha Bhosle",
+  },
+  {
     videoId: "sCu1hKTjQRs",
     title: "Sandhya Belay Tumi Ami",
     artist: "Asha Bhosle, R. D. Burman",

@@ -11,6 +11,7 @@ import SoundController from "@/components/SoundController";
 import AmbientLayer from "@/components/AmbientLayer";
 import MilestoneNotification from "@/components/MilestoneNotification";
 import { usePresence } from "@/lib/usePresence";
+import PartnerLogos from "@/components/PartnerLogos";
 
 const PLAYLIST_URL =
   "https://open.spotify.com/playlist/7jrUOCZwvxp2zWxlHZVF7L";
@@ -111,6 +112,9 @@ export default function Home() {
         />
       )}
 
+      {/* Render MusicPlayer globally on both pages */}
+      <MusicPlayer soundOn={soundOn} onToggleSound={setSoundOn} />
+
       {phase === "pandal" && (
         <>
           <div className="pointer-events-none fixed inset-x-0 top-0 z-20 flex items-start justify-between p-5 sm:p-7">
@@ -133,10 +137,12 @@ export default function Home() {
                 <span>Back</span>
               </button>
             </div>
+            <div className="pointer-events-auto hidden md:block">
+              <PartnerLogos />
+            </div>
             <VisitorCounter count={count} />
           </div>
 
-          <MusicPlayer />
           <MilestoneNotification count={count} event={event} />
 
           {isMobile && showMobileHint && (

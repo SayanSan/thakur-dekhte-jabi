@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { PUJO_PLAYLIST, PLAYLIST_URL } from "@/lib/pujoPlaylist";
 import { useYouTubePlayer } from "@/lib/useYouTubePlayer";
@@ -12,12 +12,18 @@ function formatTime(seconds: number) {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
-export default function MusicPlayer() {
+interface MusicPlayerProps {
+  soundOn?: boolean;
+  onToggleSound?: (on: boolean) => void;
+}
+
+export default function MusicPlayer({ soundOn, onToggleSound }: MusicPlayerProps) {
   const [showPlaylist, setShowPlaylist] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   const {
     containerRef,
+    ready,
     isPlaying,
     currentTime,
     duration,
@@ -29,7 +35,23 @@ export default function MusicPlayer() {
     goPrev,
     goToIndex,
     seekToFraction,
+    play,
+    pause,
   } = useYouTubePlayer(PUJO_PLAYLIST);
+
+  // Synchronize playing state with global soundOn prop
+  useEffect(() => {
+    if (soundOn === undefined) return;
+    if (soundOn) {
+      if (ready && !isPlaying) {
+        play();
+      }
+    } else {
+      if (isPlaying) {
+        pause();
+      }
+    }
+  }, [soundOn, ready, isPlaying, play, pause]);
 
   const progress = duration > 0 ? currentTime / duration : 0;
 
@@ -210,7 +232,13 @@ export default function MusicPlayer() {
 
           <button
             type="button"
-            onClick={toggle}
+            onClick={() => {
+              if (onToggleSound) {
+                onToggleSound(!isPlaying);
+              } else {
+                toggle();
+              }
+            }}
             aria-label={isPlaying ? "Pause" : "Play"}
             className="flex h-10 w-10 items-center justify-center rounded-full border border-[#c9a35e]/60 bg-[#c9a35e]/10 text-[#f3ecdf] transition-all hover:bg-[#c9a35e]/20 hover:scale-105"
           >

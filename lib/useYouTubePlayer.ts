@@ -210,6 +210,8 @@ export function useYouTubePlayer(tracks: Track[]) {
     goPrev,
     goToIndex,
     seekToFraction,
+    play,
+    pause,
   };
 }
 

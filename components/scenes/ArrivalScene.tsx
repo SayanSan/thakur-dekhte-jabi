@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import Image from "next/image";
-import ArrivalBgMusic from "@/components/ArrivalBgMusic";
+import PartnerLogos from "@/components/PartnerLogos";
 
 type ArrivalSceneProps = {
   onEnter: () => void;
@@ -183,8 +183,6 @@ export default function ArrivalScene({
 
   return (
     <div className="relative h-dvh w-full overflow-hidden bg-[#060408] perspective-1000 select-none">
-      {/* Background music for the arrival page */}
-      <ArrivalBgMusic soundOn={soundOn} />
       {/* Dynamic Ambient Background Blur */}
       <div
         ref={containerRef}
@@ -282,12 +280,12 @@ export default function ArrivalScene({
             ))}
           </div>
 
-          {/* Header Title Floating Badge (Z = 90px) */}
           <div
             ref={titleRef}
-            className="relative z-30 flex flex-col items-center pt-8 text-center sm:pt-12"
+            className="relative z-30 flex flex-col items-center pt-8 text-center sm:pt-12 gap-4"
             style={{ transform: "translateZ(90px)", transformStyle: "preserve-3d" }}
           >
+            <PartnerLogos />
             <div className="inline-flex items-center gap-2 rounded-full border border-[#c9a35e]/40 bg-[#0d0a12]/90 px-4 py-1.5 shadow-lg">
               <span className="h-2 w-2 rounded-full bg-[#ff9548] animate-pulse" />
               <span className="font-bengali text-xs uppercase tracking-[0.25em] text-[#f3ecdf]">
