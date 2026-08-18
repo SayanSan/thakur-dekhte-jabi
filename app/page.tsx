@@ -93,6 +93,12 @@ export default function Home() {
 
   return (
     <div className="relative h-dvh w-full bg-black">
+      {/* Preload the pandal background while the visitor is still reading
+          the arrival screen, so it's decoded and cached before the
+          transition needs it instead of competing with it for a frame. */}
+      <link rel="preload" as="image" href="/pandal-inner.jpg" />
+      <link rel="preload" as="image" href="/mobile-bg-pandal.jpg" />
+
       {/* Real YouTube playback engine (always mounted globally) */}
       <div ref={player.containerRef} className="absolute h-px w-px overflow-hidden opacity-0" />
 

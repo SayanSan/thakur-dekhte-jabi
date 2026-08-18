@@ -67,6 +67,20 @@ export default function ArrivalScene({
       ease: "power3.out",
     });
 
+    // The glare's `background` write forces a repaint (gradients aren't
+    // compositor-only like transforms), so it's batched to one write per
+    // animation frame instead of once per raw pointermove — pointermove
+    // can fire well above 60Hz on high-poll-rate mice/trackpads, and each
+    // extra write was extra jank for no visible benefit.
+    let pendingGlare: { x: number; y: number } | null = null;
+    let glareRaf = 0;
+    const flushGlare = () => {
+      glareRaf = 0;
+      if (!pendingGlare || !glareRef.current) return;
+      const { x, y } = pendingGlare;
+      glareRef.current.style.background = `radial-gradient(circle at ${x}% ${y}%, rgba(255, 220, 160, 0.28) 0%, rgba(255, 180, 100, 0.08) 40%, transparent 75%)`;
+    };
+
     const handlePointerMove = (e: PointerEvent) => {
       const { innerWidth, innerHeight } = window;
       const xNorm = e.clientX / innerWidth - 0.5; // -0.5 to 0.5
@@ -81,12 +95,8 @@ export default function ArrivalScene({
       bgXTo.current?.(xNorm * -25);
       bgYTo.current?.(yNorm * -15);
 
-      // Glare lighting position
-      if (glareRef.current) {
-        const glareX = (xNorm + 0.5) * 100;
-        const glareY = (yNorm + 0.5) * 100;
-        glareRef.current.style.background = `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255, 220, 160, 0.28) 0%, rgba(255, 180, 100, 0.08) 40%, transparent 75%)`;
-      }
+      pendingGlare = { x: (xNorm + 0.5) * 100, y: (yNorm + 0.5) * 100 };
+      if (!glareRaf) glareRaf = requestAnimationFrame(flushGlare);
     };
 
     const handlePointerLeave = () => {
@@ -106,6 +116,7 @@ export default function ArrivalScene({
     return () => {
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("pointerleave", handlePointerLeave);
+      if (glareRaf) cancelAnimationFrame(glareRaf);
     };
   }, []);
 
@@ -170,16 +181,18 @@ export default function ArrivalScene({
     };
   }, []);
 
-  // Handle click zoom enter effect
+  // Handle click zoom enter effect — scale/opacity only. The previous
+  // version also animated rotateX and z (3D translateZ) on this same
+  // element at the same time as the full-screen teleport overlay was
+  // animating on top of it, which is what made the click feel choppy:
+  // that's two heavy 3D/composite workloads fighting for the same frames.
   const handleEnterClick = () => {
     if (cardRef.current) {
       gsap.to(cardRef.current, {
-        scale: 1.35,
-        rotateX: -10,
-        z: 300,
+        scale: 1.15,
         opacity: 0,
-        duration: 1.1,
-        ease: "power3.inOut",
+        duration: 0.6,
+        ease: "power2.in",
       });
     }
     onEnter();

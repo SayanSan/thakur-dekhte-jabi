@@ -25,15 +25,16 @@ export default function PandalScene() {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    // Deceleration arrival animation
+    // Deceleration arrival animation — transform/opacity only, no animated
+    // filter: blurring a full-screen image every frame is what was making
+    // this choppy, since it forces a re-rasterize instead of a GPU composite.
     gsap.fromTo(
       rootRef.current,
-      { scale: 1.08, filter: "blur(10px) brightness(1.4)", opacity: 0 },
+      { scale: 1.06, opacity: 0 },
       {
         scale: 1,
-        filter: "blur(0px) brightness(1)",
         opacity: 1,
-        duration: 1.4,
+        duration: 0.9,
         ease: "power2.out",
       },
     );
@@ -73,7 +74,7 @@ export default function PandalScene() {
   return (
     <div
       ref={rootRef}
-      className="relative h-dvh w-full overflow-hidden bg-black select-none"
+      className="relative h-dvh w-full overflow-hidden bg-black select-none will-change-transform"
     >
       {/* 3D Depth Image Layer (Fits Full Screen) */}
       <div

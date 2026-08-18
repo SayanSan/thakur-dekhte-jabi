@@ -9,9 +9,13 @@ type EnterPandalTransitionProps = {
   onFlashPeak?: () => void;
 };
 
-const TELEPORT_STREAKS = Array.from({ length: 32 }, (_, i) => ({
+// Fewer streaks, each cheaper to paint — the per-streak blur() was the
+// costliest part (a separate rasterize per element) for a barely-visible
+// softening; box-shadow glow alone reads the same at speed.
+const STREAK_COUNT = 20;
+const TELEPORT_STREAKS = Array.from({ length: STREAK_COUNT }, (_, i) => ({
   id: i,
-  angle: (360 / 32) * i,
+  angle: (360 / STREAK_COUNT) * i,
   distance: 30 + (i % 5) * 15,
   delay: (i % 8) * 0.02,
   length: 120 + (i % 4) * 80,
@@ -101,13 +105,13 @@ export default function EnterPandalTransition({
   return (
     <div
       ref={containerRef}
-      className="pointer-events-none fixed inset-0 z-[100] overflow-hidden bg-black/40 backdrop-blur-sm select-none"
+      className="pointer-events-none fixed inset-0 z-[100] overflow-hidden bg-black/60 select-none"
       aria-hidden
     >
       {/* 3D Teleportation Warp Speed Tunnel */}
       <div
         ref={tunnelRef}
-        className="absolute left-1/2 top-1/2 h-0 w-0 -translate-x-1/2 -translate-y-1/2"
+        className="absolute left-1/2 top-1/2 h-0 w-0 -translate-x-1/2 -translate-y-1/2 will-change-transform"
       >
         {TELEPORT_STREAKS.map((s) => (
           <div
@@ -120,7 +124,6 @@ export default function EnterPandalTransition({
               background:
                 "linear-gradient(to right, rgba(255,215,120,0) 0%, rgba(255,180,90,0.95) 40%, rgba(255,255,255,1) 85%, transparent 100%)",
               boxShadow: "0 0 15px 3px rgba(255, 170, 70, 0.8)",
-              filter: "blur(0.5px)",
             }}
           />
         ))}
